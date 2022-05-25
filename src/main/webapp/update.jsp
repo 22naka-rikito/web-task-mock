@@ -15,9 +15,11 @@
 			<a href="menu.html">商品管理システム</a>
 		</h1>
 		<div class="user">
-			<p class="user_name">佐藤さん、こんにちは</p>
-			<form class="logout_form" action="logout.html" method="get">
-				<button class="logout_btn" type="submit">
+			<c:if test="${not empty user}">
+				<p class="user_name">${user.id}</p>
+			</c:if>
+			<form class="logout_form" action="servlet" method="get">
+				<button class="logout_btn" type="submit" name="btn" value="logout">
 					<img src="images/ドアアイコン.png">ログアウト
 				</button>
 			</form>
@@ -28,27 +30,38 @@
 
 	<div class="insert">
 		<div class="form_body">
-			<p class="error">エラーメッセージ</p>
-
+			<c:if test="${not empty errorMsg[3]}">
+				<p class="error">${errorMsg[3]}</p>
+			</c:if>
 			<form action="servlet" method="get">
 				<fieldset class="label-130">
 					<div>
-						<label>商品ID</label> <input type="text" name="loginId"
-							value="${product.getId()}" class="base-text"> <span
-							class="error">エラーメッセージ</span>
+						<label>商品ID</label> <input type="text" name="prpduct_id_old"
+							value="${product.getId()}" class="base-text" readonly>
 					</div>
 					<div>
-						<label>商品名</label> <input type="text" name="userName"
-							value="${product.getName()}" class="base-text"> <span
-							class="error">エラーメッセージ</span>
+						<label>商品ID</label> <input type="text" name="prpduct_id"
+							value="${product.getId()}" class="base-text">
+						<c:if test="${not empty errorMsg[0]}">
+							<span class="error">${errorMsg[0]}</span>
+						</c:if>
 					</div>
 					<div>
-						<label>単価</label> <input type="text" name="tel"
-							value="${product.getPrice()}" class="base-text"> <span
-							class="error">エラーメッセージ</span>
+						<label>商品名</label> <input type="text" name="prpduct_name"
+							value="${product.getName()}" class="base-text">
+						<c:if test="${not empty errorMsg[1]}">
+							<span class="error">${errorMsg[1]}</span>
+						</c:if>
 					</div>
 					<div>
-						<label>カテゴリ</label> <select name="roleId" class="base-text">
+						<label>単価</label> <input type="text" name="price"
+							value="${product.getPrice()}" class="base-text">
+						<c:if test="${not empty errorMsg[2]}">
+							<span class="error">${errorMsg[2]}</span>
+						</c:if>
+					</div>
+					<div>
+						<label>カテゴリ</label> <select name="category" class="base-text">
 							<c:forEach var="category" items="${category}">
 								<c:choose>
 									<c:when test="${category.getId() == product.getCategoryId()}">
@@ -74,8 +87,7 @@ ${product.getDescription()}
 				</fieldset>
 				<div class="btns">
 					<button type="button" onclick="openModal()" class="basic_btn">更新</button>
-					<input type="button"
-						onclick="location.href='./servlet?id=${product.getId()}&btn=detail'"
+					<input type="button" onclick="location.href='./servlet?btn=back'"
 						value="メニューに戻る" class="cancel_btn">
 				</div>
 				<div id="modal">

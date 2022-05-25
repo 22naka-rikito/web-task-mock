@@ -19,8 +19,8 @@
 			<c:if test="${not empty user}">
 				<p class="user_name">${user.id}</p>
 			</c:if>
-			<form class="logout_form" action="logout.html" method="get">
-				<button class="logout_btn" type="submit">
+			<form class="logout_form" action="servlet" method="get">
+				<button class="logout_btn" type="submit" name="btn" value="logout">
 					<img src="images/ドアアイコン.png">ログアウト
 				</button>
 			</form>
@@ -36,7 +36,12 @@
 			</div>
 			<form action="servlet" method="get">
 				<fieldset class="label-130 product_block">
-					<p class="error">エラーメッセージ</p>
+					<c:if test="${not empty str}">
+						<div>
+							<p class="error">${str}</p>
+						</div>
+					</c:if>
+
 					<div>
 						<label>商品ID</label> <input type="text" name="loginId"
 							value="${product.getId()}" readonly class="base-text">
@@ -66,8 +71,8 @@ ${product.getDescription()}
 					<div class="btns">
 						<input type="button" onclick="openModal()" value="削除"
 							class="basic_btn"> <input type="button"
-							onclick="location.href='./servlet?id=${product.getId()}&btn=edit'" value="編集"
-							class="basic_btn"> <input type="button"
+							onclick="location.href='./servlet?id=${product.getId()}&btn=edit'"
+							value="編集" class="basic_btn"> <input type="button"
 							onclick="location.href='./servlet?btn=back'" value="戻る"
 							class="cancel_btn">
 					</div>

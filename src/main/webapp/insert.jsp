@@ -19,8 +19,8 @@
 			<c:if test="${not empty user}">
 				<p class="user_name">${user.id}</p>
 			</c:if>
-			<form class="logout_form" action="logout.html" method="get">
-				<button class="logout_btn" type="submit">
+			<form class="logout_form" action="servlet" method="get">
+				<button class="logout_btn" type="submit" name="btn" value="logout">
 					<img src="images/ドアアイコン.png">ログアウト
 				</button>
 			</form>
@@ -38,7 +38,6 @@
 		<div class="form_body">
 			<c:if test="${not empty errorMsg[3]}">
 				<p class="error">${errorMsg[3]}</p>
-
 			</c:if>
 
 			<form action="servlet" method="get">
@@ -68,11 +67,9 @@
 					<div class="select_block">
 						<label class="required">カテゴリ</label> <select name="category"
 							class="base-text">
-							<option value="1">筆記具</option>
-							<option value="2">紙製品</option>
-							<option value="3">事務消耗品</option>
-							<option value="4">オフィス機器</option>
-							<option value="5">雑貨</option>
+							<c:forEach var="category" items="${category}">
+								<option value="${category.getId()}">${category.getName()}</option>
+							</c:forEach>
 						</select>
 					</div>
 					<div>
@@ -92,7 +89,8 @@
 				<div id="modal">
 					<p class="modal_message">登録しますか？</p>
 					<div class="btns">
-						<button type="submit" class="basic_btn" name="btn" value="register">登録</button>
+						<button type="submit" class="basic_btn" name="btn"
+							value="register">登録</button>
 						<button type="button" onclick="closeModal()" class="cancel_btn">キャンセル</button>
 					</div>
 				</div>

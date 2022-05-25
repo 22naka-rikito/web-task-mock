@@ -23,10 +23,13 @@ public class ProductDao {
 			+ "WHERE p.product_id = ?";
 
 	private static final String SQL_FIND_ID = "SELECT product_id FROM products WHERE product_id = ?";
-	private static final String INSERT_PRODUCTS = "INSERT INTO products (product_id, category_id, name, price, description) "
+	private static final String INSERT_PRODUCTS = "INSERT INTO products ("
+			+ "product_id, category_id, name, price, description) "
 			+ "values(?, ?, ?, ?, ?)";
 	private static final String DELETE_PRODUCTS ="DELETE FROM products WHERE product_id = ?";
-
+	private static final String UPDATE_PRODUCT = "UPDATE products set product_id = ?, category_id = ?"
+			+ ", name = ?, price = ?, description = ? "
+			+ "WHERE product_id = ?";
 	public ProductDao(Connection connection) {
 		this.connection = connection;
 	}
@@ -68,15 +71,16 @@ public class ProductDao {
 		}
 	}
 
-	public boolean checkID(String productId) {
+	public Products checkID(String productId) {
 		try (PreparedStatement stmt = connection.prepareStatement(SQL_FIND_ID)) {
 			stmt.setInt(1, Integer.parseInt(productId));
 			ResultSet rs = stmt.executeQuery();
-
+			
 			if (rs.next()) {
-				return true;
+				Products product = new Products(rs.getInt("product_id"));
+				return product;
 			}
-			return false;
+			return null;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -99,6 +103,20 @@ public class ProductDao {
 		try (PreparedStatement stmt = connection.prepareStatement(DELETE_PRODUCTS)) {
 			stmt.setInt(1, id);
 
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void updateProduct(Products product, String productIdOld) {
+		try (PreparedStatement stmt = connection.prepareStatement(UPDATE_PRODUCT)) {
+			stmt.setInt(1, product.getId());
+			stmt.setInt(2, product.getCategoryId());
+			stmt.setString(3, product.getName());
+			stmt.setInt(4, product.getPrice());
+			stmt.setString(5,product.getDescription());
+			stmt.setInt(6, Integer.parseInt(productIdOld));
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);

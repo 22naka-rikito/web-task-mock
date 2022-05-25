@@ -23,8 +23,8 @@
 					<p class="user_name">${user.id}</p>
 				</c:if>
 
-				<form class="logout_form" action="logout.html" method="get">
-					<button class="logout_btn" type="submit">
+				<form class="logout_form" action="servlet" method="get">
+					<button class="logout_btn" type="submit" name="btn" value="logout">
 						<img src="images/ドアアイコン.png">ログアウト
 					</button>
 				</form>
