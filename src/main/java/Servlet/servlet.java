@@ -40,11 +40,8 @@ public class servlet extends HttpServlet {
 			throws ServletException, IOException {
 		String btn = request.getParameter("btn");
 		String path = "";
-
 		HttpSession session = request.getSession(false);
-
 		if ("find".equals(btn)) {
-			// 検索
 			String findWord = request.getParameter("findWord");
 
 			MenuService manuService = new MenuService(btn);
@@ -55,13 +52,11 @@ public class servlet extends HttpServlet {
 			session.setAttribute("findSize", "検索結果:" + list.size() + "件");
 			request.setAttribute("msg", manuService.getMsg());
 		} else if ("insert".equals(btn)) {
-			// 登録画面に移動
 			MenuService manuService = new MenuService(btn);
 			path = manuService.getPath();
 
 			request.setAttribute("category", manuService.categoryAll());
 		} else if ("detail".equals(btn)) {
-			// 詳細画面に移動
 			String id = request.getParameter("id");
 			MenuService manuService = new MenuService(btn);
 			path = manuService.getPath();
@@ -149,39 +144,28 @@ public class servlet extends HttpServlet {
 			String selectOrderBy = request.getParameter("select_order_by");
 			@SuppressWarnings("unchecked")
 			List<Products> list = (List<Products>) session.getAttribute("findList");
+			path = "menu.jsp";
 			if ("id".equals(selectOrderBy)) {
-				path = "menu.jsp";
 				list.sort((p1, p2) -> p1.getId() >= p2.getId() ? 1 : -1);
-				session.setAttribute("findList", list);
-				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
 			} else if ("category".equals(selectOrderBy)) {
-				path = "menu.jsp";
 				list.sort((p1, p2) -> p1.getCategoryName().compareTo(p2.getCategoryName()));
-				session.setAttribute("findList", list);
-				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
 			} else if ("price_asc".equals(selectOrderBy)) {
-				path = "menu.jsp";
 				list.sort((p1, p2) -> p1.getPrice() >= p2.getPrice() ? 1 : -1);
-				session.setAttribute("findList", list);
-				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
 			} else if ("price_desc".equals(selectOrderBy)) {
-				path = "menu.jsp";
 				list.sort((p1, p2) -> p1.getPrice() >= p2.getPrice() ? -1 : 1);
-				session.setAttribute("findList", list);
-				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
-			}
-
-			else {
+			} else {
 				if (session.getAttribute("user") == null) {
 					request.getRequestDispatcher("index.jsp").forward(request, response);
 				} else {
 					request.getRequestDispatcher("menu.jsp").forward(request, response);
 				}
+				return;
 			}
+			session.setAttribute("findList", list);
+			session.setAttribute("findSize", "検索結果:" + list.size() + "件");
 		}
 		request.getRequestDispatcher(path).forward(request, response);
 	}
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
