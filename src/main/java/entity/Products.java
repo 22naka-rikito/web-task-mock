@@ -27,6 +27,8 @@ public class Products {
 		this.description = description;
 	}
 
+	
+	//インサートで使うやつ
 	public Products(Integer id, String name, Integer price, String description, Integer categoryID) {
 		this.id = id;
 		this.name = name;

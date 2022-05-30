@@ -44,14 +44,14 @@
 				<fieldset class="label-130">
 					<div>
 						<label class="required">商品ID</label> <input type="text"
-							name="prpduct_id" class="base-text">
+							name="product_id" class="base-text">
 						<c:if test="${not empty errorMsg[0]}">
 							<span class="error">${errorMsg[0]}</span>
 						</c:if>
 					</div>
 					<div>
 						<label class="required">商品名</label> <input type="text"
-							name="prpduct_name" class="base-text">
+							name="product_name" class="base-text">
 						<c:if test="${not empty errorMsg[1]}">
 							<span class="error">${errorMsg[1]}</span>
 						</c:if>

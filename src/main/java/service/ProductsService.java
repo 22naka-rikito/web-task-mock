@@ -30,9 +30,9 @@ public class ProductsService {
 	public Products findProduct(Integer id) {
 		try (Connection connection = DbUtil.getConnection()) {
 			ProductDao productsDao = new ProductDao(connection);
-			Products products;
-			products = productsDao.findId(id);
-			return products;
+			Products product;
+			product = productsDao.findId(id);
+			return product;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

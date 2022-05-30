@@ -69,12 +69,15 @@ ${product.getDescription()}
 				</fieldset>
 				<div>
 					<div class="btns">
-						<input type="button" onclick="openModal()" value="削除"
-							class="basic_btn"> <input type="button"
-							onclick="location.href='./servlet?id=${product.getId()}&btn=edit'"
-							value="編集" class="basic_btn"> <input type="button"
-							onclick="location.href='./servlet?btn=back'" value="戻る"
-							class="cancel_btn">
+						<c:if test="${user.role == 1}">
+							<input type="button" onclick="openModal()" value="削除"
+								class="basic_btn">
+							<input type="button"
+								onclick="location.href='./servlet?id=${product.getId()}&btn=edit'"
+								value="編集" class="basic_btn">
+						</c:if>
+						<input type="button" onclick="location.href='./servlet?btn=back'"
+							value="戻る" class="cancel_btn">
 					</div>
 					<div id="modal">
 						<p class="modal_message">削除しますか？</p>

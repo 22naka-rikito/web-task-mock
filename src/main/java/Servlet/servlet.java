@@ -1,6 +1,7 @@
 package Servlet;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,10 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import entity.Products;
-import service.CategoryService;
+import service.DetailService;
 import service.IndexService;
 import service.InsertService;
-import service.ProductsService;
+import service.MenuService;
 import service.UpdateService;
 
 /**
@@ -39,163 +40,145 @@ public class servlet extends HttpServlet {
 			throws ServletException, IOException {
 		String btn = request.getParameter("btn");
 		String path = "";
-		
+
 		HttpSession session = request.getSession(false);
-		if(session.getAttribute("user") == null) {
-			request.getRequestDispatcher("index.jsp").forward(request, response);
-			return ;
-		}
 
 		if ("find".equals(btn)) {
-			path = "menu.jsp";
+			// 検索
+			String findWord = request.getParameter("findWord");
 
-			String findText = request.getParameter("search");
-			ProductsService productsService = new ProductsService();
-			request.setAttribute("findList", productsService.findResult(findText));
-			if (productsService.getSize() == 0) {
-				request.setAttribute("str", "検索結果がありません");
-			}
-			request.setAttribute("findSize", "検索結果:" + productsService.getSize() + "件");
+			MenuService manuService = new MenuService(btn);
+			path = manuService.getPath();
+			List<Products> list = manuService.findProducts(findWord);
+
+			session.setAttribute("findList", list);
+			session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+			request.setAttribute("msg", manuService.getMsg());
 		} else if ("insert".equals(btn)) {
-			path = "insert.jsp";
-			CategoryService categoryService = new CategoryService();
-			request.setAttribute("category", categoryService.categoryAll());
-		} else if ("register".equals(btn)) {
-			String productId = request.getParameter("prpduct_id");
-			String name = request.getParameter("prpduct_name");
-			String price = request.getParameter("price");
-			String category = request.getParameter("category");
-			String description = request.getParameter("description");
+			// 登録画面に移動
+			MenuService manuService = new MenuService(btn);
+			path = manuService.getPath();
 
-			InsertService insertService = new InsertService();
-			String[] errorMsg = new String[4];
-
-			CategoryService categoryService = new CategoryService();
-
-			path = "insert.jsp";
-
-			if ((!"".equals(productId)) && (!"".equals(name)) && (!"".equals(price))) {
-				if (insertService.productIdCheck(productId)) {
-					errorMsg[3] = "商品IDが重複しています";
-					request.setAttribute("category", categoryService.categoryAll());
-				} else {
-					path = "menu.jsp";
-					Products product = new Products(Integer.parseInt(productId), name, Integer.parseInt(price),
-							description, Integer.parseInt(category));
-					insertService.insertProduct(product);
-					String str = "登録が完了しました";
-					String findText = "";
-					ProductsService productsService = new ProductsService();
-
-					request.setAttribute("findList", productsService.findResult(findText));
-					request.setAttribute("findSize", "検索結果:" + productsService.getSize() + "件");
-					request.setAttribute("str", str);
-				}
-			} else {
-				if (productId.equals("")) {
-					errorMsg[0] = "商品IDは必須です";
-				}
-				if (name.equals("")) {
-					errorMsg[1] = "商品名は必須です";
-				}
-				if (price.equals("")) {
-					errorMsg[2] = "単価は必須です";
-				}
-				request.setAttribute("category", categoryService.categoryAll());
-			}
-			request.setAttribute("errorMsg", errorMsg);
-		} else if ("back".equals(btn)) {
-			path = "menu.jsp";
-			String findText = "";
-			ProductsService productsService = new ProductsService();
-
-			request.setAttribute("findList", productsService.findResult(findText));
-			request.setAttribute("findSize", "検索結果:" + productsService.getSize() + "件");
+			request.setAttribute("category", manuService.categoryAll());
 		} else if ("detail".equals(btn)) {
-			path = "detail.jsp";
+			// 詳細画面に移動
 			String id = request.getParameter("id");
+			MenuService manuService = new MenuService(btn);
+			path = manuService.getPath();
 
-			ProductsService productsService = new ProductsService();
-			request.setAttribute("product", productsService.findProduct(Integer.parseInt(id)));
-		} else if ("delete".equals(btn)) {
-			path = "menu.jsp";
-			String id = request.getParameter("loginId");
-			String str = "";
-			ProductsService productsService = new ProductsService();
-			if (!"".equals(id)) {
-				String findText = "";
-				productsService.deleteProduct(Integer.parseInt(id));
-				str = "削除に成功しました";
-				request.setAttribute("findList", productsService.findResult(findText));
-				request.setAttribute("findSize", "検索結果:" + productsService.getSize() + "件");
-			} else {
-				str = "削除に失敗しました。";
-				path = "detail.jsp";
-			}
-			request.setAttribute("str", str);
-		} else if ("edit".equals(btn)) {
-			path = "update.jsp";
-			String id = request.getParameter("id");
-
-			ProductsService productsService = new ProductsService();
-			CategoryService categoryService = new CategoryService();
-
-			request.setAttribute("product", productsService.findProduct(Integer.parseInt(id)));
-			request.setAttribute("category", categoryService.categoryAll());
-		} else if ("update".equals(btn)) {
-			String productId = request.getParameter("prpduct_id");
-			String productIdOld = request.getParameter("prpduct_id_old");
-			String name = request.getParameter("prpduct_name");
+			request.setAttribute("product", manuService.findProduct(Integer.parseInt(id)));
+		} else if ("register".equals(btn)) {
+			String productId = request.getParameter("product_id");
+			String name = request.getParameter("product_name");
 			String price = request.getParameter("price");
 			String category = request.getParameter("category");
 			String description = request.getParameter("description");
 
-			UpdateService updateService = new UpdateService();
-			String[] errorMsg = new String[4];
+			InsertService insertService = new InsertService(productId, name, price, category, description);
+			path = insertService.getPath(btn);
 
-			ProductsService productsService = new ProductsService();
-			CategoryService categoryService = new CategoryService();
-
-			path = "update.jsp";
-
-			if ((!"".equals(productId)) && (!"".equals(name)) && (!"".equals(price))) {
-				if (updateService.productIdCheck(productId, productIdOld)) {
-					errorMsg[3] = "商品IDが重複しています";
-					request.setAttribute("category", categoryService.categoryAll());
-				} else {
-					path = "menu.jsp";
-					Products product = new Products(Integer.parseInt(productId), name, Integer.parseInt(price),
-							description, Integer.parseInt(category));
-					
-					
-					updateService.updateProduct(product, productIdOld);
-					String str = "更新が完了しました";
-					String findText = "";
-
-					request.setAttribute("findList", productsService.findResult(findText));
-					request.setAttribute("findSize", "検索結果:" + productsService.getSize() + "件");
-					request.setAttribute("str", str);
-				}
-			} else {
-				if (productId.equals("")) {
-					errorMsg[0] = "商品IDは必須です";
-				}
-				if (name.equals("")) {
-					errorMsg[1] = "商品名は必須です";
-				}
-				if (price.equals("")) {
-					errorMsg[2] = "単価は必須です";
-				}
-				request.setAttribute("category", categoryService.categoryAll());
+			if ("menu.jsp".equals(path)) {
+				insertService.insertProduct();
+				List<Products> productsList = insertService.findProducts();
+				session.setAttribute("findList", productsList);
+				session.setAttribute("findSize", "検索結果:" + productsList.size() + "件");
+				request.setAttribute("msg", "登録が完了しました");
+			} else if ("insert.jsp".equals(path)) {
+				request.setAttribute("category", insertService.categoryAll());
+				request.setAttribute("errorMsg", insertService.getErrorMsg());
 			}
-			request.setAttribute("errorMsg", errorMsg);
-			request.setAttribute("product", productsService.findProduct(Integer.parseInt(productIdOld)));
+		} else if ("back".equals(btn)) {
+			InsertService insertService = new InsertService();
+			path = insertService.getPath(btn);
+			List<Products> list = insertService.findProducts();
+
+			session.setAttribute("findList", list);
+			session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+		} else if ("delete".equals(btn)) {
+			String productId = request.getParameter("loginId");
+			String msg = "";
+			DetailService detailService = new DetailService();
+			path = detailService.getPath(btn, productId);
+
+			if ("menu.jsp".equals(path)) {
+				List<Products> list = detailService.delete(productId);
+				msg = "削除に成功しました";
+				session.setAttribute("findList", list);
+				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+			} else if ("detail.jsp".equals(path)) {
+				msg = "削除に失敗しました。";
+			}
+			request.setAttribute("msg", msg);
+		} else if ("edit".equals(btn)) {
+			String productId = request.getParameter("id");
+			DetailService detailService = new DetailService();
+			path = detailService.getPath(btn, productId);
+			request.setAttribute("product", detailService.findProduct(Integer.parseInt(productId)));
+			request.setAttribute("category", detailService.categoryAll());
+		} else if ("update".equals(btn)) {
+			String productIdOld = request.getParameter("product_id_old");
+			String productId = request.getParameter("product_id");
+			String name = request.getParameter("product_name");
+			String price = request.getParameter("price");
+			String category = request.getParameter("category");
+			String description = request.getParameter("description");
+			UpdateService updateService = new UpdateService(productId, name, price, category, description,
+					productIdOld);
+			path = updateService.getPath(btn);
+
+			if ("menu.jsp".equals(path)) {
+				updateService.updateProduct();
+				List<Products> productList = updateService.findProducts();
+
+				session.setAttribute("findList", productList);
+				session.setAttribute("findSize", "検索結果:" + productList.size() + "件");
+				request.setAttribute("msg", "更新が完了しました");
+			} else if ("update.jsp".equals(path)) {
+				request.setAttribute("category", updateService.categoryAll());
+				request.setAttribute("errorMsg", updateService.getErrorMsg());
+				request.setAttribute("product", updateService.findProduct(Integer.parseInt(productIdOld)));
+			}
 		} else if ("logout".equals(btn)) {
 			path = "logout.jsp";
 			session = request.getSession(false);
 			session.setAttribute("user", null);
-		}
+		} else if ("sort".equals(btn)) {
+			path = "index.jsp";
+			System.out.print("a");
+		} else {
+			String selectOrderBy = request.getParameter("select_order_by");
+			@SuppressWarnings("unchecked")
+			List<Products> list = (List<Products>) session.getAttribute("findList");
+			if ("id".equals(selectOrderBy)) {
+				path = "menu.jsp";
+				list.sort((p1, p2) -> p1.getId() >= p2.getId() ? 1 : -1);
+				session.setAttribute("findList", list);
+				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+			} else if ("category".equals(selectOrderBy)) {
+				path = "menu.jsp";
+				list.sort((p1, p2) -> p1.getCategoryName().compareTo(p2.getCategoryName()));
+				session.setAttribute("findList", list);
+				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+			} else if ("price_asc".equals(selectOrderBy)) {
+				path = "menu.jsp";
+				list.sort((p1, p2) -> p1.getPrice() >= p2.getPrice() ? 1 : -1);
+				session.setAttribute("findList", list);
+				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+			} else if ("price_desc".equals(selectOrderBy)) {
+				path = "menu.jsp";
+				list.sort((p1, p2) -> p1.getPrice() >= p2.getPrice() ? -1 : 1);
+				session.setAttribute("findList", list);
+				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+			}
 
+			else {
+				if (session.getAttribute("user") == null) {
+					request.getRequestDispatcher("index.jsp").forward(request, response);
+				} else {
+					request.getRequestDispatcher("menu.jsp").forward(request, response);
+				}
+			}
+		}
 		request.getRequestDispatcher(path).forward(request, response);
 	}
 
@@ -212,22 +195,20 @@ public class servlet extends HttpServlet {
 		if ("login".equals(btn)) {
 			String id = request.getParameter("loginId");
 			String pass = request.getParameter("pass");
-			IndexService indexservice = new IndexService(id, pass);
-			if (indexservice.login()) {
-				path = "menu.jsp";
-				HttpSession session = request.getSession(false);
-				String findText = "";
-				ProductsService productsService = new ProductsService();
 
-				request.setAttribute("findList", productsService.findResult(findText));
-				request.setAttribute("findSize", "検索結果:" + productsService.getSize() + "件");
-				session.setAttribute("user", indexservice.getUser());
-			} else {
-				path = "index.jsp";
+			IndexService indexservice = new IndexService(id, pass);
+			path = indexservice.getPath();
+
+			if (path.equals("index.jsp")) {
 				request.setAttribute("errorMsg", indexservice.getErrorMsg());
+			} else {
+				HttpSession session = request.getSession(false);
+				List<Products> list = indexservice.getList();
+				session.setAttribute("findList", list);
+				session.setAttribute("findSize", "検索結果:" + list.size() + "件");
+				session.setAttribute("user", indexservice.getUser());
 			}
 		}
 		request.getRequestDispatcher(path).forward(request, response);
 	}
-
 }

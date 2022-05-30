@@ -33,15 +33,18 @@
 		<hr>
 
 		<div class="btn">
-			<a class="basic_btn regist" href="servlet?btn=insert">新規登録</a>
+			<c:if test="${user.role == 1}">
+				<a class="basic_btn regist" href="servlet?btn=insert">新規登録</a>
+			</c:if>
+
 		</div>
-		<c:if test="${not empty str}">
+		<c:if test="${not empty msg}">
 			<div>
-				<p>${str}</p>
+				<p>${msg}</p>
 			</div>
 		</c:if>
 		<form method="get" action="servlet?btn=find" class="search_container">
-			<input type="text" name="search" size="25" placeholder="キーワード検索">
+			<input type="text" name="findWord" size="25" placeholder="キーワード検索">
 			<input type="submit" name="btn" value="find">
 		</form>
 
@@ -50,15 +53,17 @@
 				<p>${findSize}</p>
 			</c:if>
 			<div class="order">
-				<select class="base-text" name="select_order_by">
-					<option value="normal">並び替え</option>
-					<option value="id">商品ID</option>
-					<option value="category">カテゴリ</option>
-					<option value="price_asc">単価：安い順</option>
-					<option value="price_desc">単価：高い順</option>
-					<option>登録日：古い順</option>
-					<option>登録日：新しい順</option>
-				</select>
+				<form action="servlet?btn=sort">
+					<select class="base-text" name="select_order_by"
+						onchange="submit(this.form)">
+						<option value="normal">並び替え</option>
+						<option value="id">商品ID</option>
+						<option value="category">カテゴリ</option>
+						<option value="price_asc">単価：安い順</option>
+						<option value="price_desc">単価：高い順</option>
+					</select>
+				</form>
+				
 			</div>
 			<thead>
 				<tr>
@@ -76,7 +81,8 @@
 						<td>${product.getName()}</td>
 						<td>${product.getPrice()}</td>
 						<td>${product.getCategory().getName()}</td>
-						<td><a class="detail_btn" href="./servlet?id=${product.getId()}&btn=detail">詳細</a></td>
+						<td><a class="detail_btn"
+							href="./servlet?id=${product.getId()}&btn=detail">詳細</a></td>
 					</tr>
 				</c:forEach>
 			</tbody>

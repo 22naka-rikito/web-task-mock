@@ -36,18 +36,18 @@
 			<form action="servlet" method="get">
 				<fieldset class="label-130">
 					<div>
-						<label>商品ID</label> <input type="text" name="prpduct_id_old"
+						<label>商品ID</label> <input type="text" name="product_id_old"
 							value="${product.getId()}" class="base-text" readonly>
 					</div>
 					<div>
-						<label>商品ID</label> <input type="text" name="prpduct_id"
+						<label>商品ID</label> <input type="text" name="product_id"
 							value="${product.getId()}" class="base-text">
 						<c:if test="${not empty errorMsg[0]}">
 							<span class="error">${errorMsg[0]}</span>
 						</c:if>
 					</div>
 					<div>
-						<label>商品名</label> <input type="text" name="prpduct_name"
+						<label>商品名</label> <input type="text" name="product_name"
 							value="${product.getName()}" class="base-text">
 						<c:if test="${not empty errorMsg[1]}">
 							<span class="error">${errorMsg[1]}</span>

@@ -15,29 +15,13 @@ public class UserDao{
 	    this.connection = connection;
 	}
 	
-	public User selectUser(String id){
-		try (PreparedStatement stmt = connection.prepareStatement(SQL_SELECT_USER)) {
-			stmt.setString(1, id);
-	        ResultSet rs = stmt.executeQuery();
-	        User user;
-
-	        if (rs.next()) {
-	        	user = new User(rs.getString("login_id"), rs.getString("password"), rs.getString("name"));
-	        	return user;
-	        }
-	        return null;
-	    } catch (SQLException e) {
-	        throw new RuntimeException(e);
-	    }
-	}
-	
 	public User findUser(String id) {
 		try (PreparedStatement stmt = connection.prepareStatement(SQL_SELECT_USER)) {
 			stmt.setString(1, id);
 	        ResultSet rs = stmt.executeQuery();
 
 	        if (rs.next()) {
-	        	User user = new User(rs.getString("login_id"), rs.getString("password"), rs.getString("name"));
+	        	User user = new User(rs.getString("login_id"), rs.getString("password"), rs.getString("name"),rs.getInt("role"));
 	        	return user;
 	        }
 	        return null;
